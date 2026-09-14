@@ -1,69 +1,188 @@
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import { ReservationForm } from "@/components/ReservationForm";
+import { MenuCategory } from "@/components/MenuCategory";
 
-export default function Home() {
+const CATEGORY_ORDER = [
+  "Coffee & Espresso",
+  "Fresh In-House Pastries",
+  "Seasonal Plates",
+  "Teas & Seasonal Drinks",
+];
+
+type MenuItem = {
+  name: string;
+  price: string;
+  category: string;
+  sort_order: number;
+};
+
+export default async function Home() {
+  const { data: menuItems } = await supabase
+    .from("menu_items")
+    .select("name, price, category, sort_order")
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true });
+
+  const itemsByCategory = new Map<string, MenuItem[]>();
+  for (const item of (menuItems ?? []) as MenuItem[]) {
+    const existing = itemsByCategory.get(item.category) ?? [];
+    existing.push(item);
+    itemsByCategory.set(item.category, existing);
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <>
+      {/* HEADER */}
+      <header className="sticky top-0 z-10">
+        <div className="bg-[#5C1A24] text-[#FAF3E7] text-xs tracking-wide py-2 overflow-hidden">
+          <div className="flex w-max animate-marquee">
+            <span className="flex shrink-0 items-center">
+              <span>Open Mon–Fri 8am–6pm · Sat–Sun 9am–4pm</span>
+              <span className="mx-8">•</span>
+              <span>Fresh pastries baked daily</span>
+              <span className="mx-4">•</span>
+            </span>
+            <span className="flex shrink-0 items-center" aria-hidden="true">
+              <span>Open Mon–Fri 8am–6pm · Sat–Sun 9am–4pm</span>
+              <span className="mx-8">•</span>
+              <span>Fresh pastries baked daily</span>
+              <span className="mx-4">•</span>
+            </span>
+          </div>
+        </div>
+        <div className="bg-[#E8DCC8] border-b border-black/10">
+          <div className="max-w-5xl mx-auto px-8 py-5 flex items-center justify-between">
+            <a
+              href="#about"
+              className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
+            >
+              About
+            </a>
+            <div className="font-display text-4xl font-semibold text-[#5C1A24]">
+              Nook Cafe
+            </div>
+            <div className="flex items-center gap-6">
+              <a
+                href="#menu"
+                className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
+              >
+                Menu
+              </a>
+              <a
+                href="#reservations"
+                className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
+              >
+                Reservations
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="relative w-full h-[80vh]">
         <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/cafepic.jpg"
+          alt="Nook Cafe interior"
+          fill
           priority
+          className="object-cover"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-5xl mx-auto px-8 w-full">
+            <div className="max-w-md bg-[#5C1A24]/90 text-[#FAF3E7] p-10 rounded-lg">
+              <h1 className="font-display text-4xl leading-tight">
+                The neighbourhood living room, your 3rd space and second home
+              </h1>
+              <a
+                href="#menu"
+                className="inline-block mt-8 px-8 py-3.5 bg-[#FAF3E7] text-[#5C1A24] font-display font-semibold rounded hover:bg-[#e9dcc4] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              >
+                View Menu
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="py-20 bg-[#F1E8D8]">
+        <div className="max-w-xl mx-auto px-8 text-center">
+          <h2 className="font-display text-3xl text-[#5C1A24] mb-5">
+            About Nook
+          </h2>
+          <p className="text-lg">
+            Welcome to Nook, a neighbourhood spot for community connection. We
+            source our coffee from local roasters and brew it fresh daily, all
+            pastries are baked in house and based on seasonal ingredients.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* MENU */}
+      <section id="menu" className="py-20 bg-[#5C1A24]">
+        <div className="max-w-5xl mx-auto px-8">
+          <div className="bg-[#F1E8D8] rounded-2xl p-12">
+            <h2 className="font-display text-3xl text-[#5C1A24] text-center mb-16">
+              Menu
+            </h2>
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-12">
+              {CATEGORY_ORDER.map((category) => (
+                <MenuCategory
+                  key={category}
+                  category={category}
+                  items={itemsByCategory.get(category) ?? []}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* RESERVATIONS */}
+      <section id="reservations" className="py-20 bg-[#F1E8D8]">
+        <div className="max-w-xl mx-auto px-8">
+          <h2 className="font-display text-3xl text-[#5C1A24] text-center mb-3">
+            Reservations
+          </h2>
+          <p className="text-center text-[#2B211C]/80 mb-10">
+            Book a table and we&apos;ll send you a confirmation by email.
+          </p>
+          <ReservationForm />
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer id="footer" className="bg-[#C9BB9E] text-[#2B211C] pt-14 pb-8">
+        <div className="max-w-5xl mx-auto px-8 flex flex-wrap justify-between gap-8">
+          <div>
+            <h3 className="font-display text-lg mb-2">Visit Us</h3>
+            <p className="text-sm opacity-90">
+              12 Carrer de la Llum
+              <br />
+              Barcelona, Spain
+            </p>
+          </div>
+          <div>
+            <h3 className="font-display text-lg mb-2">Hours</h3>
+            <p className="text-sm opacity-90">
+              Mon–Fri: 8am–6pm
+              <br />
+              Sat–Sun: 9am–4pm
+            </p>
+          </div>
+          <div>
+            <h3 className="font-display text-lg mb-2">Follow</h3>
+            <a href="#" className="text-sm opacity-90">
+              @nookcafe
+            </a>
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto px-8 mt-10 pt-5 border-t border-black/10 text-xs opacity-70 text-center">
+          © 2026 Nook Cafe. All rights reserved.
+        </div>
+      </footer>
+    </>
   );
 }
