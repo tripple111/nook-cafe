@@ -2,6 +2,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { ReservationForm } from "@/components/ReservationForm";
 import { MenuCategory } from "@/components/MenuCategory";
+import { MobileNav } from "@/components/MobileNav";
 
 const CATEGORY_ORDER = [
   "Coffee & Espresso",
@@ -52,29 +53,32 @@ export default async function Home() {
           </div>
         </div>
         <div className="bg-[#E8DCC8] border-b border-black/10">
-          <div className="max-w-5xl mx-auto px-8 py-5 flex items-center justify-between">
-            <a
-              href="#about"
-              className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
-            >
-              About
-            </a>
-            <div className="font-display text-4xl font-semibold text-[#5C1A24]">
-              Nook Cafe
-            </div>
-            <div className="flex items-center gap-6">
+          <div className="max-w-5xl mx-auto px-8 py-5">
+            <MobileNav />
+            <div className="hidden md:flex items-center justify-between">
               <a
-                href="#menu"
+                href="#about"
                 className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
               >
-                Menu
+                About
               </a>
-              <a
-                href="#reservations"
-                className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
-              >
-                Reservations
-              </a>
+              <div className="font-display text-4xl font-semibold text-[#5C1A24]">
+                Nook Cafe
+              </div>
+              <div className="flex items-center gap-6">
+                <a
+                  href="#menu"
+                  className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
+                >
+                  Menu
+                </a>
+                <a
+                  href="#reservations"
+                  className="text-sm font-medium hover:text-[#5C1A24] transition-colors duration-200"
+                >
+                  Reservations
+                </a>
+              </div>
             </div>
           </div>
         </div>
